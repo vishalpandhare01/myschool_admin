@@ -26,6 +26,7 @@ import {
   AccountCircle,
 } from "@mui/icons-material";
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 // Drawer width constant
 const drawerWidth = 240;
@@ -38,6 +39,7 @@ const Layout = ({ children }) => {
   const [profileAnchorEl, setProfileAnchorEl] = useState(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const { user } = useAuth();
 
   // Handle mobile drawer toggle
   const handleDrawerToggle = () => {
@@ -136,21 +138,23 @@ const Layout = ({ children }) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap sx={{ fontWeight: 600 }}>
-            My Application
+            My School (Admin)
           </Typography>
 
           {/* Box to align the icons to the right */}
-          <Box sx={{ ml: "auto", display: "flex", alignItems: "center" }}>
-            {/* Notification Icon */}
-            <IconButton color="inherit" onClick={handleNotificationClick}>
-              <Notifications />
-            </IconButton>
+          {user && (
+            <Box sx={{ ml: "auto", display: "flex", alignItems: "center" }}>
+              {/* Notification Icon */}
+              <IconButton color="inherit" onClick={handleNotificationClick}>
+                <Notifications />
+              </IconButton>
 
-            {/* Profile Icon */}
-            <IconButton color="inherit" onClick={handleProfileClick}>
-              <AccountCircle />
-            </IconButton>
-          </Box>
+              {/* Profile Icon */}
+              <IconButton color="inherit" onClick={handleProfileClick}>
+                <AccountCircle />
+              </IconButton>
+            </Box>
+          )}
         </Toolbar>
       </AppBar>
 
@@ -189,7 +193,7 @@ const Layout = ({ children }) => {
           flexGrow: 1,
           bgcolor: theme.palette.background.default,
           paddingTop: theme.spacing(8), // To account for AppBar
-          marginTop: theme.spacing(8),
+          // marginTop: theme.spacing(8),
           padding: theme.spacing(3),
         }}
       >

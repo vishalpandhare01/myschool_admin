@@ -2,26 +2,23 @@ import React from "react";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { useMemo } from "react";
 import Layout from "@/component/layout/layoutcomponent";
+import { AuthProvider } from "@/context/AuthContext";
+import { SnackbarProvider } from "notistack";
 
 function MyApp({ Component, pageProps }) {
-  const theme = createTheme({
-    // palette: {
-    //   primary: {
-    //     main: "#3f51b5",
-    //   },
-    //   secondary: {
-    //     main: "#f50057",
-    //   },
-    // },
-  });
+  const theme = createTheme({});
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-    </ThemeProvider>
+    <SnackbarProvider maxSnack={3}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AuthProvider >
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </AuthProvider>
+      </ThemeProvider>
+    </SnackbarProvider>
   );
 }
 
