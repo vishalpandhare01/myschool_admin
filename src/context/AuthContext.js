@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 const AuthContext = createContext();
@@ -9,29 +9,45 @@ export function useAuth() {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [isClient, setIsClient] = useState(false); // Add a client-side check
   const router = useRouter();
 
-  // Check for user session on page load
   useEffect(() => {
-    // You can replace this with a real authentication check (cookie, session, etc.)
-    const storedUser = JSON.parse(sessionStorage.getItem("token"));
-    if (storedUser) {
-      setUser(storedUser);
-    } else {
-      setUser(null);
-    }
+    setIsClient(true); // We now know we are on the client side
   }, []);
 
+  useEffect(() => {
+    if (isClient) {
+      // Only run this effect on the client side
+      try {
+        const storedUser = sessionStorage.getItem("token");
+        if (storedUser) {
+          setUser(storedUser);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error("Error loading user data from sessionStorage:", error);
+      }
+    }
+  }, [isClient]);
+
   const login = (token) => {
-    setUser(token);
-    sessionStorage.setItem("token", token);
-    router.push("/dashbord");
+    try {
+      setUser(token);
+      sessionStorage.setItem("token", token); // Store token as a string
+      router.push("/dashboard");
+    } catch (error) {
+      console.log("errror in login: ", error);
+    }
   };
 
   const logout = () => {
-    setUser(null);
-    sessionStorage.removeItem("token");
-    router.push("/login"); // redirect to login
+    try {
+      setUser(null);
+      sessionStorage.removeItem("token");
+      router.push("/login"); // redirect to login
+    } catch (error) {}
   };
 
   return (

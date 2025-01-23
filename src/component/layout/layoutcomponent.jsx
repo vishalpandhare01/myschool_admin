@@ -19,14 +19,23 @@ import {
 import {
   Menu as MenuIcon,
   Dashboard,
+  School,
+  AttachMoney,
+  Report,
+  PostAdd,
+  Flag,
+  Message,
+  Feedback as FeedbackIcon,
+  Web,
   Settings,
   Person,
   ExitToApp,
   Notifications,
   AccountCircle,
 } from "@mui/icons-material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/router";
 
 // Drawer width constant
 const drawerWidth = 240;
@@ -39,7 +48,7 @@ const Layout = ({ children }) => {
   const [profileAnchorEl, setProfileAnchorEl] = useState(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   // Handle mobile drawer toggle
   const handleDrawerToggle = () => {
@@ -49,15 +58,34 @@ const Layout = ({ children }) => {
   // List items with icons
   const menuItems = [
     { text: "Dashboard", icon: <Dashboard />, url: "/dashboard" },
-    { text: "Settings", icon: <Settings />, url: "/settings" },
-    { text: "Profile", icon: <Person />, url: "/profile" },
-    { text: "Logout", icon: <ExitToApp />, url: "/logout" },
+    { text: "Schools", icon: <School />, url: "/schools" },
+    { text: "Profit", icon: <AttachMoney />, url: "/profit" },
+    { text: "Report", icon: <Report />, url: "/report" },
+    { text: "Posts", icon: <PostAdd />, url: "/posts" },
+    { text: "Reported Posts", icon: <Flag />, url: "/reported-posts" },
+    { text: "Messages", icon: <Message />, url: "/messages" },
+    { text: "Feedback", icon: <FeedbackIcon />, url: "/feedback" },
+    { text: "Webbuilder", icon: <Web />, url: "/webbuilder" },
   ];
+  const router = useRouter();
+
+  useEffect(() => {
+    const currentIndex = menuItems.findIndex(
+      (item) => item.url === router.asPath
+    );
+    if (currentIndex !== -1) {
+      setSelectedIndex(currentIndex); // Set the selected index when the URL changes
+    }
+  }, [router.asPath]);
 
   // Handle item click
   const handleItemClick = (index) => {
-    setSelectedIndex(index); // Set the selected item index
-    console.log(menuItems[index].url); // Handle item URL if necessary
+    try {
+      setSelectedIndex(index); // Set the selected item index
+      if (router.asPath != menuItems[index].url) {
+        router.push(`/${menuItems[index].url}`);
+      }
+    } catch (error) {}
   };
 
   // Notification Menu handling
@@ -73,6 +101,7 @@ const Layout = ({ children }) => {
     setProfileAnchorEl(event.currentTarget); // Set anchor element for profile menu
   };
   const handleProfileClose = () => {
+    logout();
     setProfileAnchorEl(null); // Close profile menu
   };
 
@@ -193,7 +222,6 @@ const Layout = ({ children }) => {
           flexGrow: 1,
           bgcolor: theme.palette.background.default,
           paddingTop: theme.spacing(8), // To account for AppBar
-          // marginTop: theme.spacing(8),
           padding: theme.spacing(3),
         }}
       >
