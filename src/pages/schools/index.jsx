@@ -1,29 +1,69 @@
 import Register from "@/component/auth/register";
 import DynamicTable from "@/component/share/tabble";
-
-const data = [
-  { id: 1, salary: 5000, name: "John Doe", age: 28 },
-  { id: 2, salary: 5000, name: "Jane Smith", age: 32 },
-  { id: 3, salary: 5000, name: "Alice Brown", age: 24 },
-  { id: 4, salary: 5000, name: "Bob Johnson", age: 45 },
-  { id: 5, salary: 5000, name: "Charlie Lee", age: 36 },
-  { id: 6, salary: 5000, name: "David Lee", age: 29 },
-  { id: 7, salary: 5000, name: "Emma Watson", age: 22 },
-  { id: 8, salary: 5000, name: "Liam Neeson", age: 60 },
-  { id: 9, salary: 5000, name: "Zoe Kravitz", age: 31 },
-  { id: 10, salary: 5000, name: "Chris Hemsworth", age: 38 },
-];
+import { useEffect, useState } from "react";
+import { getSchoolsApi } from "../api/school";
+import { Button } from "@mui/material";
 
 const columns = [
-  { field: "name", headerName: "Name" },
-  { field: "age", headerName: "Age" },
-  { field: "email", headerName: "Email" },
+  // { field: "ID", headerName: "ID" },
+  { field: "FirstName", headerName: "Name" },
+  { field: "SchoolName", headerName: "School Name" },
+  { field: "Address", headerName: "Address" },
+  { field: "Email", headerName: "Email" },
+  { field: "MobileNumber", headerName: "Phone" },
+  { field: "IsPaidSchool", headerName: "Paid School" },
 ];
 
 const SchoolsPage = () => {
+  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(2);
+  const [totalPage, setTotalPage] = useState(0);
+  const [data, setData] = useState([]);
+  const [Serach, setSerach] = useState("");
+  const [isPaid, setIsPaid] = useState("");
+
+  async function fetchSchoolData() {
+    try {
+      const response = await getSchoolsApi({
+        page: page,
+        limit: limit,
+        school_name: Serach,
+        isPaid: isPaid,
+      });
+      setData(response.data.Data);
+      setTotalPage(response.data.Total);
+    } catch (error) {}
+  }
+
+  async function updateData(row) {
+    try {
+      console.log("row for update: ", row);
+    } catch (error) {}
+  }
+
+  useEffect(() => {
+    fetchSchoolData();
+  }, [page, setPage, Serach, isPaid]);
+
   return (
     <>
-      <DynamicTable data={data} columns={columns} addComponent={<Register />} />
+      <DynamicTable
+        data={data}
+        columns={columns}
+        addComponent={<Register />}
+        setTotalPage={setTotalPage}
+        setPage={setPage}
+        setLimit={setLimit}
+        totalPage={totalPage}
+        page={page}
+        limit={limit}
+        setSerach={setSerach}
+        Serach={Serach}
+        updateData={updateData}
+      />
+      <Button onClick={() => setIsPaid("true")}>Check Paid school</Button>
+      <Button onClick={() => setIsPaid("false")}>Check Unpaid school</Button>
+      <Button onClick={() => setIsPaid("")}>clear</Button>
     </>
   );
 };

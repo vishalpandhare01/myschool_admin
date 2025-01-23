@@ -15,16 +15,27 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Switch,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CloseIcon from "@mui/icons-material/Close";
 
-const DynamicTable = ({ data, columns, addComponent }) => {
+const DynamicTable = ({
+  data,
+  columns,
+  addComponent,
+  totalPage,
+  setPage,
+  page,
+  setLimit,
+  limit,
+  setSerach,
+  Serach,
+  updateData,
+}) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [openDialog, setOpenDialog] = useState(false);
 
   // Handle table pagination
@@ -33,16 +44,15 @@ const DynamicTable = ({ data, columns, addComponent }) => {
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
+    setLimit(+event.target.value);
     setPage(0);
   };
 
   const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
+    setSerach(e.target.value);
   };
 
   const handleActionClick = (action, id) => {
-    // Handle Edit, Delete, and View actions here
     console.log(`${action} clicked for ID: ${id}`);
   };
 
@@ -67,9 +77,15 @@ const DynamicTable = ({ data, columns, addComponent }) => {
     setOpenDialog(false);
   };
 
+  // Handle switch toggle (for IsPaidSchool)
+  const handleSwitchChange = (e, row) => {
+    try {
+      updateData(row);
+    } catch (error) {}
+  };
+
   return (
     <Paper sx={{ marginTop: 8, width: "100%", overflow: "hidden" }}>
-      {/* Add New School Button */}
       <Button
         variant="contained"
         color="primary"
@@ -79,21 +95,21 @@ const DynamicTable = ({ data, columns, addComponent }) => {
         Add New
       </Button>
 
-      {/* Search Bar */}
       <TextField
         label="Search"
+        type="text"
         variant="outlined"
         fullWidth
-        value={searchQuery}
+        value={Serach}
         onChange={handleSearchChange}
         sx={{ marginBottom: 2 }}
       />
 
-      {/* Table */}
       <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
+              <TableCell>No.</TableCell>
               {columns.map((col) => (
                 <TableCell key={col.field}>{col.headerName}</TableCell>
               ))}
@@ -101,48 +117,55 @@ const DynamicTable = ({ data, columns, addComponent }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredData
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => (
-                <TableRow key={row.id}>
-                  {columns.map((col) => (
-                    <TableCell key={col.field}>{row[col.field]}</TableCell>
-                  ))}
-                  <TableCell>
-                    <IconButton
-                      onClick={() => handleActionClick("view", row.id)}
-                    >
-                      <VisibilityIcon />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => handleActionClick("edit", row.id)}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => handleActionClick("delete", row.id)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
+            {filteredData.map((row, i) => (
+              <TableRow key={row.id}>
+                <TableCell>{i + 1 + page * limit}</TableCell>
+                {columns.map((col) => (
+                  <>
+                    {col.field && col.field !== "IsPaidSchool" ? (
+                      <TableCell key={col.field}>{row[col.field]}</TableCell>
+                    ) : (
+                      <TableCell key={col.field}>
+                        <Switch
+                          checked={row[col.field]}
+                          value={row[col]}
+                          onChange={(e) => handleSwitchChange(e, row)}
+                          color="primary"
+                          inputProps={{ "aria-label": "controlled" }}
+                        />
+                      </TableCell>
+                    )}
+                  </>
+                ))}
+                <TableCell>
+                  <IconButton onClick={() => handleActionClick("view", row.id)}>
+                    <VisibilityIcon />
+                  </IconButton>
+                  <IconButton onClick={() => handleActionClick("edit", row.id)}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => handleActionClick("delete", row.id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
 
-      {/* Pagination */}
       <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
+        rowsPerPageOptions={[2, 5, 10, 25]}
         component="div"
-        count={filteredData.length}
-        rowsPerPage={rowsPerPage}
+        count={totalPage}
+        rowsPerPage={limit}
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
 
-      {/* Add New School Dialog */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>
           <div
@@ -152,7 +175,6 @@ const DynamicTable = ({ data, columns, addComponent }) => {
               alignItems: "center",
             }}
           >
-            {/* <span>Add New School</span> */}
             <IconButton onClick={handleCloseDialog}>
               <CloseIcon />
             </IconButton>
