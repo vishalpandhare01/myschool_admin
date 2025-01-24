@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setUser(null);
       sessionStorage.removeItem("token");
-      router.push("/login"); // redirect to login
+      location.replace("/login")
     } catch (error) {}
   };
 

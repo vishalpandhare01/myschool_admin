@@ -1,8 +1,9 @@
 import Register from "@/component/auth/register";
 import DynamicTable from "@/component/share/tabble";
 import { useEffect, useState } from "react";
-import { getSchoolsApi } from "../api/school";
+import { getSchoolsApi, updateschoolPaidOrUnpaidsApi } from "../api/school";
 import { Button } from "@mui/material";
+import { useSnackbar } from "notistack";
 
 const columns = [
   // { field: "ID", headerName: "ID" },
@@ -16,11 +17,12 @@ const columns = [
 
 const SchoolsPage = () => {
   const [page, setPage] = useState(0);
-  const [limit, setLimit] = useState(2);
+  const [limit, setLimit] = useState(5);
   const [totalPage, setTotalPage] = useState(0);
   const [data, setData] = useState([]);
   const [Serach, setSerach] = useState("");
   const [isPaid, setIsPaid] = useState("");
+  const { enqueueSnackbar } = useSnackbar();
 
   async function fetchSchoolData() {
     try {
@@ -38,6 +40,9 @@ const SchoolsPage = () => {
   async function updateData(row) {
     try {
       console.log("row for update: ", row);
+      const response = await updateschoolPaidOrUnpaidsApi(row.ID);
+      enqueueSnackbar(response.message);
+      fetchSchoolData();
     } catch (error) {}
   }
 
