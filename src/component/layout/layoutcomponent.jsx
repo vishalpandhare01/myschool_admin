@@ -101,7 +101,6 @@ const Layout = ({ children }) => {
     setProfileAnchorEl(event.currentTarget); // Set anchor element for profile menu
   };
   const handleProfileClose = () => {
-    logout();
     setProfileAnchorEl(null); // Close profile menu
   };
 
@@ -267,7 +266,7 @@ const Layout = ({ children }) => {
       >
         <MenuItem onClick={handleProfileClose}>View Profile</MenuItem>
         <MenuItem onClick={handleProfileClose}>Settings</MenuItem>
-        <MenuItem onClick={handleProfileClose}>Logout</MenuItem>
+        <MenuItem onClick={()=>logout()}>Logout</MenuItem>
       </Menu>
     </Box>
   );

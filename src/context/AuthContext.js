@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setUser(token);
       sessionStorage.setItem("token", token); // Store token as a string
-      router.push("/dashboard");
+      location.replace("/dashboard");
     } catch (error) {
       console.log("errror in login: ", error);
     }

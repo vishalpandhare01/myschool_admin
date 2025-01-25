@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { getSchoolsApi, updateschoolPaidOrUnpaidsApi } from "../api/school";
 import { Button } from "@mui/material";
 import { useSnackbar } from "notistack";
+import ProtectedRoute from "@/component/ProtectedRoute";
+
 
 const columns = [
   // { field: "ID", headerName: "ID" },
@@ -51,7 +53,7 @@ const SchoolsPage = () => {
   }, [page, setPage, Serach, isPaid]);
 
   return (
-    <>
+    <ProtectedRoute>
       <DynamicTable
         data={data}
         columns={columns}
@@ -69,7 +71,7 @@ const SchoolsPage = () => {
       <Button onClick={() => setIsPaid("true")}>Check Paid school</Button>
       <Button onClick={() => setIsPaid("false")}>Check Unpaid school</Button>
       <Button onClick={() => setIsPaid("")}>clear</Button>
-    </>
+    </ProtectedRoute>
   );
 };
 
